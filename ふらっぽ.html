@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ぬるぽちゃん</title>
+    <style>* { padding: 0; margin: 0; }</style>
+    <script src="phaser.min.js"></script>
+</head>
+<body>
+<script>
+    var game = new Phaser.Game(480, 640, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+    function preload() {
+        game.load.image('block1', 'assets/block1.png')//これわスプライト
+        game.load.image('block2', 'assets/block2.png');
+        game.load.image('block3', 'assets/block3.png');
+        game.load.image('background', 'assets/back.png');
+        game.load.image('bird', 'assets/nyan.png');
+    }
+    function create() {
+       var sprite = game.add.tileSprite(0, 0, 480, 640, 'background');
+        var spriteB1 =game.add.sprite(210,0,'block1');
+        var spriteBird =game.add.sprite(0,320,'bird');
+        spriteBird.scale.setTo(0.4,0.5);
+        spriteBird.width = 90;
+        spriteBird.height = 100;
+    }
+
+    function update () {
+    }
+</script>
+</body>
+</html>
