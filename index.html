@@ -32,6 +32,7 @@
             game.load.image('block3_1', 'assets/block3_1.png');
             game.load.image('block3_2', 'assets/block3_2.png');
             game.load.image('background', 'assets/back.png');
+            game.load.image('restart', 'assets/restart.png');
             game.load.image('bird', 'assets/nyan.png');
             game.load.spritesheet('button', 'assets/heart_pixel.png',300,300,3);
         },
@@ -129,7 +130,7 @@
      GameOverState.create = function() {
         game.stage.backgroundColor = '#FFC0CB';
         var button = game.add.button(game.world.centerX-140 , game.world.centerY-300, 'button', actionOnClick, this, 0, 1, 2);
-        
+        game.add.sprite(30,370,'restart');
         button.onInputOver.add(over, this);
         button.onInputOut.add(out, this);
          button.onInputUp.add(up, this);
