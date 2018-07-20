@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>ぬるぽちゃんのゲイム</title>
+    <style>* { padding: 0; margin: 0; }</style>
+    <script src="phaser.min.js"></script>
+</head>
+<body>
+<script>
+    var best;
+    var game = new Phaser.Game(400, 640);
+    var sprite;
+    var jumpButton;
+    var cursor;
+    var spriteBird;
+    var pipe1;
+    var pipe2;
+    var pipe3;
+    var pipe4;
+    var pipes;
+    var score;
+    var timer;
+    var total = -1;
+    var nyanNeko = function(game){}
+    nyanNeko.prototype = {
+        preload: function() { 
+            game.load.image('block2_1', 'assets/block2_1.png')//これわスプライト
+            game.load.image('block2_2', 'assets/block2_2.png');
+            game.load.image('block1_1', 'assets/block1_1.png');
+            game.load.image('block1_2', 'assets/block1_2.png');
+            game.load.image('block3_1', 'assets/block3_1.png');
+            game.load.image('block3_2', 'assets/block3_2.png');
+            game.load.image('background', 'assets/back.png');
+            game.load.image('bird', 'assets/nyan.png');
+            game.load.spritesheet('button', 'assets/heart_pixel.png',300,300,3);
+        },
+        create: function() { 
+            game.physics.startSystem(Phaser.Physics.ARCADE);
+            sprite = game.add.tileSprite(0, 0, 480, 640, 'background');
+            score = game.add.text(10,10,"S -",{
+				font:"bold 16px Arial"
+			});
+			best = localStorage.getItem("max")==null?0:localStorage.getItem("max");
+           
+           score.text = "Score: 0\nBest: "+best;
+            spriteBird =game.add.sprite(20,320,'bird');
+            spriteBird.width = 70;
+            spriteBird.height = 60;
+            game.physics.arcade.enable(spriteBird);
+            spriteBird.body.gravity.y = 1000;  
+            //spriteBird.body.fixedRotation = true;
+            //game.camera.follow(spriteBird);
+            //cursor = game.input.keyboard.createCursorKeys();
+            jumpButton = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+            jumpButton.onDown.add(jump, this); 
+            addPipe();
+            timer = this.game.time.create(false);
+            timer.loop(1999,addPipe,this);
+            timer.start();
+            
+        },
+        update: function() {
+            game.physics.arcade.overlap(spriteBird,pipe1, this.restart, null, this);
+            game.physics.arcade.overlap(spriteBird,pipe2, this.restart, null, this);
+            game.physics.arcade.overlap(spriteBird,pipe3, this.restart, null, this);
+            game.physics.arcade.overlap(spriteBird,pipe4, this.restart, null, this);
+            if(spriteBird.y > 640) 
+                this.restart();
+        },
+        restart: function() {
+            localStorage.setItem("max",Math.max(total,best));
+            this.game.time.events.remove(timer); 
+            total=-1;
+            game.state.start('over');
+   
+            //game.state.start('main');
+      }
+    };
+    function updScore(){
+         score.text = "Score: "+total+"\nBest: "+best;
+    }
+    function addPipe(){
+            var npipe;
+            var npipe2;
+            var n = randomInt(1,3);
+            if(n==1){
+                 npipe = game.add.sprite(400,0,'block1_1');
+                 npipe2 = game.add.sprite(400,450,'block1_2');
+            }
+            else if(n==2){
+                 npipe = game.add.sprite(400,0,'block2_1');
+                npipe2 = game.add.sprite(400,300,'block2_2');
+            }
+            else{
+                 npipe = game.add.sprite(400,0,'block3_1');
+                 npipe2 = game.add.sprite(400,400,'block3_2');
+            }
+            game.physics.arcade.enable(npipe);
+            npipe.body.velocity.x = -200; 
+            npipe.checkWorldBounds = true;
+            npipe.outOfBoundsKill = true;
+            game.physics.arcade.enable(npipe2);
+            npipe2.body.velocity.x = -200; 
+            npipe2.checkWorldBounds = true;
+            npipe2.outOfBoundsKill = true;
+            if(total%2){
+                pipe1=npipe;
+                pipe2=npipe2; 
+            }
+            else{
+                pipe3=npipe;
+                pipe4=npipe2; 
+            }
+            
+            total++;
+            score.text = "Score: "+total+"\nBest: "+best;
+            
+    }
+    function randomInt (min, max) {
+            var rand = min + Math.random() * (max + 1 - min);
+            rand = Math.floor(rand);
+            return rand;
+    }
+    function jump() {
+        spriteBird.body.velocity.y = -350;
+    }
+    var GameOverState = new Phaser.State();
+     GameOverState.create = function() {
+        game.stage.backgroundColor = '#FFC0CB';
+        var button = game.add.button(game.world.centerX-140 , game.world.centerY-300, 'button', actionOnClick, this, 0, 1, 2);
+        
+        button.onInputOver.add(over, this);
+        button.onInputOut.add(out, this);
+         button.onInputUp.add(up, this);
+         // var button = game.add.sprite(40,100, 'button');
+        // button.animations.add('walk');
+        // buttton.animations.play('walk', 50, true);
+        // game.add.tween(button).to({ x: game.width }, 10000, Phaser.Easing.Linear.None, true);
+     }
+     function actionOnClick () {
+        game.state.start('main');
+
+    }
+    function up() {
+    console.log('button up', arguments);
+}
+
+function over() {
+    console.log('button over');
+}
+
+function out() {
+    console.log('button out');
+}
+    game.state.add('main', nyanNeko); 
+    game.state.add('over', GameOverState,false); 
+    game.state.start('main');
+   
+
+</script>
+</body>
+</html>
